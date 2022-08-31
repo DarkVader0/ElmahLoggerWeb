@@ -5,6 +5,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
+var config = builder.Configuration;
 
 // Endpoints
 builder.Services.AddFastEndpoints();
@@ -24,8 +25,14 @@ builder.Services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
 // Logger
 builder.Host.ConfigureLogging((ctx, logging) =>
 {
-    logging.Services.Configure<ElmahIoProviderOptions>(ctx.Configuration.GetSection("ElmahIo"));
-    logging.AddElmahIo();
+    // logging.Services.Configure<ElmahIoProviderOptions>(ctx.Configuration.GetSection("ElmahIo"));
+    logging.AddElmahIo(opt =>
+    {
+        opt.ApiKey = config["ElmahIo:ApiKey"];
+        opt.LogId = Guid.Parse(config["ElmahIo:LogId"]);
+        opt.Application = config["ElmahIo:Application"];
+        
+    });
     logging.AddFilter<ElmahIoLoggerProvider>(null, LogLevel.Error);
 });
 
