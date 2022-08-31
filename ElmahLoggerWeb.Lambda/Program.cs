@@ -31,7 +31,6 @@ builder.Host.ConfigureLogging((ctx, logging) =>
         opt.ApiKey = config["ElmahIo:ApiKey"];
         opt.LogId = Guid.Parse(config["ElmahIo:LogId"]);
         opt.Application = config["ElmahIo:Application"];
-        
     });
     logging.AddFilter<ElmahIoLoggerProvider>(null, LogLevel.Error);
 });
