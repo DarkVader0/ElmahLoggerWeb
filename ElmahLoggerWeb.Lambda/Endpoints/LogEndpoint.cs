@@ -7,17 +7,20 @@ namespace ElmahLoggerWeb.Lambda.Endpoints;
 [HttpPost("/log/error"), Authorize]
 public class LogEndpoint : Endpoint<LogRequest>
 {
-    private readonly ILogger<LogEndpoint> _logger;
+    private readonly ILoggerFactory _logger;
 
-    public LogEndpoint(ILogger<LogEndpoint> logger)
+    public LogEndpoint(ILoggerFactory logger)
     {
         _logger = logger;
     }
 
     public override async Task HandleAsync(LogRequest req, CancellationToken ct)
     {
-        _logger.LogError(req.Message);
-
+        var log = _logger.CreateLogger("LogEndpoint");
+        log.LogError(req.Message);
+        
+        
         await SendNoContentAsync(cancellation: ct);
+        Thread.Sleep(3500);
     }
 }

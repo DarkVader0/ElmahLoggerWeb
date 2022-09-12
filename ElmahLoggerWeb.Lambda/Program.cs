@@ -1,8 +1,10 @@
+using Amazon.Lambda.Core;
 using AspNetCore.Authentication.ApiKey;
 using Elmah.Io.Extensions.Logging;
 using ElmahLoggerWeb.Lambda.Authentication;
 using FastEndpoints;
 using FastEndpoints.Swagger;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 var builder = WebApplication.CreateBuilder(args);
 var config = builder.Configuration;
@@ -31,11 +33,18 @@ builder.Host.ConfigureLogging((ctx, logging) =>
         opt.ApiKey = config["ElmahIo:ApiKey"];
         opt.LogId = Guid.Parse(config["ElmahIo:LogId"]);
         opt.Application = config["ElmahIo:Application"];
-        opt.BatchPostingLimit = 1;
-        opt.BackgroundQueueSize = 1;
+        opt.OnError = (message, exception) =>
+        {
+            LambdaLogger.Log($"Error: {message} -- {exception}");
+        };
+        opt.OnMessage = (message) =>
+        {
+            LambdaLogger.Log($"Message is: {message}");
+        };
     });
     logging.AddFilter<ElmahIoLoggerProvider>(null, LogLevel.Error);
 });
+
 
 var app = builder.Build();
 
