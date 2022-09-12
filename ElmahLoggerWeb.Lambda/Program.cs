@@ -1,19 +1,30 @@
-using Amazon.Lambda.Core;
 using AspNetCore.Authentication.ApiKey;
-using Elmah.Io.Extensions.Logging;
+using Elmah.Io.Client;
 using ElmahLoggerWeb.Lambda.Authentication;
 using FastEndpoints;
 using FastEndpoints.Swagger;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 var builder = WebApplication.CreateBuilder(args);
-var config = builder.Configuration;
+var configuration = builder.Configuration;
 
 // Endpoints
 builder.Services.AddFastEndpoints();
 
 // Making it lambda
 builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+
+var options = new ElmahIoOptions
+{
+    Timeout = TimeSpan.FromMilliseconds(1)
+};
+var logger = ElmahioAPI.Create(configuration["ElmahIo:ApiKey"], options);
+logger.Messages.OnMessage += (sender, eventArgs) =>
+{
+    eventArgs.Message.Application = configuration["ElmahIo:Application"];
+};
+
+builder.Services.AddSingleton<IElmahioAPI>(logger);
+
 
 // Auth
 builder.Services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
@@ -24,26 +35,26 @@ builder.Services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
         opt.IgnoreAuthenticationIfAllowAnonymous = true;
     });
 
-// Logger
-builder.Services.AddLogging((logging) =>
-{
-    // logging.Services.Configure<ElmahIoProviderOptions>(ctx.Configuration.GetSection("ElmahIo"));
-    logging.AddElmahIo(opt =>
-    {
-        opt.ApiKey = config["ElmahIo:ApiKey"];
-        opt.LogId = Guid.Parse(config["ElmahIo:LogId"]);
-        opt.Application = config["ElmahIo:Application"];
-        opt.OnError = (message, exception) =>
-        {
-            LambdaLogger.Log($"Error: {message} -- {exception}");
-        };
-        opt.OnMessage = (message) =>
-        {
-            LambdaLogger.Log($"Message is: {message}");
-        };
-    });
-    logging.AddFilter<ElmahIoLoggerProvider>(null, LogLevel.Error);
-});
+// // Logger
+// builder.Services.AddLogging((logging) =>
+// {
+//     // logging.Services.Configure<ElmahIoProviderOptions>(ctx.Configuration.GetSection("ElmahIo"));
+//     logging.AddElmahIo(opt =>
+//     {
+//         opt.ApiKey = config["ElmahIo:ApiKey"];
+//         opt.LogId = Guid.Parse(config["ElmahIo:LogId"]);
+//         opt.Application = config["ElmahIo:Application"];
+//         opt.OnError = (message, exception) =>
+//         {
+//             LambdaLogger.Log($"Error: {message} -- {exception}");
+//         };
+//         opt.OnMessage = (message) =>
+//         {
+//             LambdaLogger.Log($"Message is: {message}");
+//         };
+//     });
+//     logging.AddFilter<ElmahIoLoggerProvider>(null, LogLevel.Error);
+// });
 
 
 var app = builder.Build();

@@ -1,4 +1,5 @@
-﻿using ElmahLoggerWeb.Lambda.Contracts.Requests;
+﻿using Elmah.Io.Client;
+using ElmahLoggerWeb.Lambda.Contracts.Requests;
 using FastEndpoints;
 using Microsoft.AspNetCore.Authorization;
 
@@ -7,20 +8,21 @@ namespace ElmahLoggerWeb.Lambda.Endpoints;
 [HttpPost("/log/error"), Authorize]
 public class LogEndpoint : Endpoint<LogRequest>
 {
-    private readonly ILoggerFactory _logger;
+    private readonly IElmahioAPI _logger;
+    private readonly string _logId;
 
-    public LogEndpoint(ILoggerFactory logger)
+    public LogEndpoint(IConfiguration configuration, IElmahioAPI elmahioApi)
     {
-        _logger = logger;
+        _logger = elmahioApi;
     }
 
     public override async Task HandleAsync(LogRequest req, CancellationToken ct)
     {
-        var log = _logger.CreateLogger("LogEndpoint");
-        log.LogError(req.Message);
-        
-        
+        await _logger.Messages.CreateAsync(_logId, new CreateMessage
+        {
+            Title = req.Message
+        }, ct);
+
         await SendNoContentAsync(cancellation: ct);
-        Thread.Sleep(3500);
     }
 }
