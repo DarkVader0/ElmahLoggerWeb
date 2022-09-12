@@ -25,7 +25,7 @@ builder.Services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
     });
 
 // Logger
-builder.Host.ConfigureLogging((ctx, logging) =>
+builder.Services.AddLogging((logging) =>
 {
     // logging.Services.Configure<ElmahIoProviderOptions>(ctx.Configuration.GetSection("ElmahIo"));
     logging.AddElmahIo(opt =>
