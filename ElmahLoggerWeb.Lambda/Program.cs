@@ -21,7 +21,6 @@ logger.Messages.OnMessage += (sender, eventArgs) =>
 
 builder.Services.AddSingleton<IElmahioAPI>(logger);
 
-
 // Auth
 builder.Services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
     .AddApiKeyInHeader<ApiKeyProvider>(opt =>
@@ -30,28 +29,6 @@ builder.Services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
         opt.KeyName = "api_key";
         opt.IgnoreAuthenticationIfAllowAnonymous = true;
     });
-
-// // Logger
-// builder.Services.AddLogging((logging) =>
-// {
-//     // logging.Services.Configure<ElmahIoProviderOptions>(ctx.Configuration.GetSection("ElmahIo"));
-//     logging.AddElmahIo(opt =>
-//     {
-//         opt.ApiKey = config["ElmahIo:ApiKey"];
-//         opt.LogId = Guid.Parse(config["ElmahIo:LogId"]);
-//         opt.Application = config["ElmahIo:Application"];
-//         opt.OnError = (message, exception) =>
-//         {
-//             LambdaLogger.Log($"Error: {message} -- {exception}");
-//         };
-//         opt.OnMessage = (message) =>
-//         {
-//             LambdaLogger.Log($"Message is: {message}");
-//         };
-//     });
-//     logging.AddFilter<ElmahIoLoggerProvider>(null, LogLevel.Error);
-// });
-
 
 var app = builder.Build();
 
