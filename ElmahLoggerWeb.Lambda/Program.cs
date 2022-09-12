@@ -13,11 +13,7 @@ builder.Services.AddFastEndpoints();
 // Making it lambda
 builder.Services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
 
-var options = new ElmahIoOptions
-{
-    Timeout = TimeSpan.FromMilliseconds(1)
-};
-var logger = ElmahioAPI.Create(configuration["ElmahIo:ApiKey"], options);
+var logger = ElmahioAPI.Create(configuration["ElmahIo:ApiKey"]);
 logger.Messages.OnMessage += (sender, eventArgs) =>
 {
     eventArgs.Message.Application = configuration["ElmahIo:Application"];
