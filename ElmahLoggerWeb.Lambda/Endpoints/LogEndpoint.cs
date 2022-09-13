@@ -20,11 +20,11 @@ public class LogEndpoint : Endpoint<LogRequest>
 
     public override async Task HandleAsync(LogRequest req, CancellationToken ct)
     {
-        _logger.Messages.Create(_logId, new CreateMessage
+        await _logger.Messages.CreateAsync(_logId, new CreateMessage
         {
             Title = req.Message,
             Severity = "Error"
-        });
+        }, ct);
 
         await SendNoContentAsync(cancellation: ct);
     }
