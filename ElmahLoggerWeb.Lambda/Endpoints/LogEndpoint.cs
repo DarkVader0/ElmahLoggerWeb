@@ -23,6 +23,7 @@ public class LogEndpoint : Endpoint<LogRequest>
         await _logger.Messages.CreateAsync(_logId, new CreateMessage
         {
             Title = req.Message,
+            Detail = req.StackTrace,
             Severity = "Error"
         }, ct);
 

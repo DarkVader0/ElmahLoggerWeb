@@ -10,4 +10,7 @@ public class LogRequest
     
     [JsonPropertyName("message")]
     public string Message { get; init; } = default!;
+    
+    [JsonPropertyName("stack")]
+    public string StackTrace { get; init; } = default!;
 }
