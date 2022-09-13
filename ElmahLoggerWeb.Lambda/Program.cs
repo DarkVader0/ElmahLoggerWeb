@@ -1,3 +1,4 @@
+using Amazon.Lambda.Core;
 using AspNetCore.Authentication.ApiKey;
 using Elmah.Io.Client;
 using ElmahLoggerWeb.Lambda.Authentication;
@@ -17,6 +18,7 @@ var logger = ElmahioAPI.Create(configuration["ElmahIo:ApiKey"]);
 logger.Messages.OnMessage += (sender, eventArgs) =>
 {
     eventArgs.Message.Application = configuration["ElmahIo:Application"];
+    LambdaLogger.Log("logged message");
 };
 
 builder.Services.AddSingleton<IElmahioAPI>(logger);

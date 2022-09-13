@@ -9,8 +9,8 @@
   "region": "eu-central-1",
   "configuration": "Release",
   "function-runtime": "dotnet6",
-  "function-memory-size": 256,
-  "function-timeout": 30,
+  "function-memory-size": 128,
+  "function-timeout": 15,
   "function-handler": "ElmahLoggerWeb.Lambda",
   "function-url-enable": true
 }
